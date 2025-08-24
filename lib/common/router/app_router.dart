@@ -123,6 +123,16 @@ class AppRouter {
       ),
 
       GoRoute(
+        path: '/set-routine',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return SetRoutineScreen(
+            routineName: extra?['routineName'] as String?,
+          );
+        },
+      ),
+
+      GoRoute(
         path: '/routine-add-complete',
         builder: (context, state) => const RoutineAddCompleteScreen(),
       ),

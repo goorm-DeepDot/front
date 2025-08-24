@@ -12,8 +12,9 @@ import '../../../utils/snak_bar.dart';
 class SetRoutineScreen extends StatefulWidget {
   final Map<String, dynamic>? existingRoutine;
   final int? routineIndex;
+  final String? routineName;
 
-  const SetRoutineScreen({super.key, this.existingRoutine, this.routineIndex});
+  const SetRoutineScreen({super.key, this.existingRoutine, this.routineIndex, this.routineName});
 
   @override
   State<SetRoutineScreen> createState() => _SetRoutineScreenState();
@@ -63,6 +64,9 @@ class _SetRoutineScreenState extends State<SetRoutineScreen> {
       _selectedDays[4] = widget.existingRoutine!['fri'] ?? false;
       _selectedDays[5] = widget.existingRoutine!['sat'] ?? false;
       _selectedDays[6] = widget.existingRoutine!['sun'] ?? false;
+    } else if (widget.routineName != null) {
+      // 루틴 추천에서 온 경우 이름 자동 입력
+      _routineNameController.text = widget.routineName!;
     }
     
     // 화면 로드 시 목표 목록 새로고침
@@ -237,7 +241,7 @@ class _SetRoutineScreenState extends State<SetRoutineScreen> {
                                 },
                               );
                             }),
-                            _buildAddGoalChip(),
+                            if (availableGoalNames.length < 5) _buildAddGoalChip(),
                           ],
                         );
                       },

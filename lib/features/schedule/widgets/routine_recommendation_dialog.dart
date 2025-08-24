@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../data/models/routine_pattern_model.dart';
 import '../../../data/models/routine_model.dart';
 import '../../../data/repositories/routine_repository.dart';
@@ -34,137 +35,102 @@ class _RoutineRecommendationDialogState extends State<RoutineRecommendationDialo
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      backgroundColor: Colors.transparent,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        width: 300,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 아이콘
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.auto_awesome,
-                color: AppTheme.primaryColor,
-                size: 30,
-              ),
-            ),
-            
-            const SizedBox(height: 20),
-            
-            // 제목
-            const Text(
-              '루틴을 발견했어요!',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
-              ),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            // 설명
-            Text(
-              '"${widget.pattern.title}"를\n${widget.pattern.weekdayPattern}${widget.pattern.time != null ? " ${widget.pattern.time}" : ""}에\n${widget.pattern.count}번 반복하셨네요!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                height: 1.5,
-                color: Colors.grey[700],
-              ),
-            ),
-            
-            const SizedBox(height: 20),
-            
-            // 루틴 정보 카드
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
+            // 텍스트 영역
+            Padding(
+              padding: const EdgeInsets.all(32),
               child: Column(
                 children: [
-                  _buildInfoRow('제목', widget.pattern.title),
-                  const SizedBox(height: 8),
-                  if (widget.pattern.time != null) ...[
-                    _buildInfoRow('시간', widget.pattern.time!),
-                    const SizedBox(height: 8),
-                  ],
-                  _buildInfoRow('요일', widget.pattern.weekdayPattern),
+                  // 제목
+                  const Text(
+                    '루틴으로 저장할까요?',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // 설명
+                  Text(
+                    '"${widget.pattern.title}" 항목을 오늘 연속 등록하였어요.\n앞으로 자동으로 반복되도록 루틴으로 만들어보세요!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.6,
+                      color: AppTheme.textBlackColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ],
               ),
             ),
             
-            const SizedBox(height: 24),
-            
-            // 버튼들
+            // 구분선
+            Container(
+              height: 1,
+              color: const Color(0xFFE0E0E0),
+            ),
+            // 버튼 영역
             Row(
               children: [
                 // 나중에 버튼
                 Expanded(
-                  child: TextButton(
-                    onPressed: _isCreating ? null : () {
+                  child: GestureDetector(
+                    onTap: _isCreating ? null : () {
                       Navigator.of(context).pop(false);
                     },
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey[300]!),
+                    child: Container(
+                      height: 48,
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Color(0xFFE0E0E0),
+                            width: 1,
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      '나중에',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[600],
+                      child: const Center(
+                        child: Text(
+                          '나중에',
+                          style: TextStyle(
+                            color: Color(0xFF666666),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-                
-                const SizedBox(width: 12),
-                
-                // 루틴 만들기 버튼
+                // 루틴 등록하기 버튼
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: _isCreating ? null : _createRoutine,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: _isCreating
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : const Text(
-                            '루틴 만들기',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+                  child: GestureDetector(
+                    onTap: _isCreating ? null : _navigateToSetRoutine,
+                    child: Container(
+                      height: 48,
+                      child: const Center(
+                        child: Text(
+                          '루틴 등록하기',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
                           ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -211,6 +177,26 @@ class _RoutineRecommendationDialogState extends State<RoutineRecommendationDialo
       print('시간 파싱 실패: $e');
     }
     return {'hour': 9, 'minute': 0}; // 기본값
+  }
+  
+  Future<void> _navigateToSetRoutine() async {
+    // 패턴 카운트 리셋
+    try {
+      await _patternRepository.resetPatternCount(
+        widget.pattern.title,
+        widget.pattern.time,
+      );
+    } catch (e) {
+      print('패턴 카운트 리셋 실패: $e');
+    }
+    
+    // 다이얼로그 닫기
+    Navigator.of(context).pop(false);
+    
+    // set_routine으로 이동하면서 제목 전달
+    context.push('/set-routine', extra: {
+      'routineName': widget.pattern.title,
+    });
   }
   
   Future<void> _createRoutine() async {
